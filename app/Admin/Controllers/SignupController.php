@@ -8,8 +8,7 @@ use Encore\Admin\Grid;
 use App\Models\Signup;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\ModelForm;
-use Illuminate\Support\Str;
-
+use Encore\Admin\Show;
 class SignupController extends AdminController
 {
     use ModelForm;
@@ -97,10 +96,9 @@ class SignupController extends AdminController
     {
         $show = new Show(Signup::findOrFail($id));
  
-        $show->id('ID');
         $show->name('姓名');
         $show->mobile('电话');
-        $show->data('附件');
+        $show->data('附件')->image();
         $show->created_at('创建时间');
         $show->updated_at('修改时间');
         return $show;
@@ -118,7 +116,9 @@ class SignupController extends AdminController
         return Admin::form(Signup::class, function (Form $form) {
             $form->text('name','姓名')->rules('required');
             $form->text('mobile','电话')->rules('required');
-            $form->image('data','附件')->rules('required')->uniqueName();
+            $form->image('data','附件')->rules('required')->name(function ($file) {
+                return request('name').'_'.request('mobile').'.'.$file->guessExtension();
+            });
            
          });
     }
